@@ -1,293 +1,144 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const CricketOverApp());
+  runApp(const PitchChallengeApp());
 }
 
-class CricketOverApp extends StatelessWidget {
-  const CricketOverApp({super.key});
+class PitchChallengeApp extends StatelessWidget {
+  const PitchChallengeApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Cricket Over Challenge',
+      title: 'Pitch Challenge',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4F46E5)),
       ),
-      home: const CricketOverScreen(),
+      home: const PitchChallengeScreen(),
     );
   }
 }
 
-class CricketOverScreen extends StatefulWidget {
-  const CricketOverScreen({super.key});
+class PitchChallengeScreen extends StatefulWidget {
+  const PitchChallengeScreen({super.key});
 
   @override
-  State<CricketOverScreen> createState() => _CricketOverScreenState();
+  State<PitchChallengeScreen> createState() => _PitchChallengeScreenState();
 }
 
-class _CricketOverScreenState extends State<CricketOverScreen> {
-  static const int maximumBalls = 6;
-
+class _PitchChallengeScreenState extends State<PitchChallengeScreen> {
   final Random _random = Random();
 
-  int totalScore = 0;
-  int ballsPlayed = 0;
-  int previousShot = 0;
+  static const int maximumBalls = 6;
 
-  String gameMessage = 'Press PLAY BALL to start the over';
+  int runs = 0;
+  int ballsRemaining = maximumBalls;
 
-  bool get overCompleted => ballsPlayed >= maximumBalls;
+  bool get gameFinished => ballsRemaining == 0;
 
-  void playBall() {
-    if (overCompleted) {
+  void playShot() {
+    if (gameFinished) {
+      restartGame();
       return;
     }
 
-    const possibleScores = [0, 1, 2, 3, 4, 6];
+    const List<int> possibleRuns = [
+      0,
+      1,
+      2,
+      3,
+      4,
+      6,
+    ];
 
-    final int runs = possibleScores[_random.nextInt(possibleScores.length)];
+    final int scoredRuns = possibleRuns[_random.nextInt(possibleRuns.length)];
 
     setState(() {
-      previousShot = runs;
-      totalScore += runs;
-      ballsPlayed++;
-
-      if (ballsPlayed == maximumBalls) {
-        gameMessage = 'Over completed! Final score: $totalScore runs';
-      } else {
-        gameMessage = shotMessage(runs);
-      }
+      runs += scoredRuns;
+      ballsRemaining--;
     });
   }
 
-  String shotMessage(int runs) {
-    switch (runs) {
-      case 0:
-        return 'Dot ball! No run scored.';
-      case 1:
-        return 'Nice single!';
-      case 2:
-        return 'Good running! Two runs.';
-      case 3:
-        return 'Three runs added!';
-      case 4:
-        return 'FOUR! Great boundary!';
-      case 6:
-        return 'SIX! Excellent shot!';
-      default:
-        return '';
-    }
-  }
-
-  void restartOver() {
+  void restartGame() {
     setState(() {
-      totalScore = 0;
-      ballsPlayed = 0;
-      previousShot = 0;
-      gameMessage = 'Press PLAY BALL to start the over';
+      runs = 0;
+      ballsRemaining = maximumBalls;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F7FC),
+      backgroundColor: const Color(0xFF16867D),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF075E57),
+        foregroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
-        backgroundColor: const Color(0xFF312E81),
-        foregroundColor: Colors.white,
         title: const Text(
-          'Cricket Over Challenge',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          'Pitch Challenge',
+          style: TextStyle(
+            fontSize: 19,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 520),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 30,
+              ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 12),
-
-                  // Bat and ball images in the previous compact design
-                  Container(
-                    width: 150,
-                    height: 105,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE0E7FF),
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Image.asset(
-                            'assets/bat.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Image.asset(
-                            'assets/ball.png',
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  const Text(
-                    'Six-Ball Cricket',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E1B4B),
-                    ),
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  const Text(
-                    'Score as many runs as possible in one over',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 15, color: Colors.black54),
-                  ),
-
-                  const SizedBox(height: 28),
-
+                  const SizedBox(height: 55),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Expanded(
-                        child: informationCard(
-                          label: 'TOTAL SCORE',
-                          value: '$totalScore',
-                          icon: Icons.scoreboard_outlined,
-                        ),
+                      cricketDisplay(
+                        imagePath: 'assets/bat.jpeg',
+                        title: 'Runs',
+                        value: '$runs',
                       ),
-                      const SizedBox(width: 14),
-                      Expanded(
-                        child: informationCard(
-                          label: 'BALLS',
-                          value: '$ballsPlayed / $maximumBalls',
-                          icon: Icons.sports_baseball_outlined,
-                        ),
+                      const SizedBox(width: 26),
+                      cricketDisplay(
+                        imagePath: 'assets/ball.jpeg',
+                        title: 'Balls',
+                        value: '$ballsRemaining',
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 22),
-
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 25,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFFE5E7EB)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 12,
-                          offset: const Offset(0, 5),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          overCompleted ? 'OVER RESULT' : 'LAST BALL',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                            color: Colors.black45,
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        Text(
-                          ballsPlayed == 0
-                              ? '-'
-                              : '$previousShot RUN${previousShot == 1 ? '' : 'S'}',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF4F46E5),
-                          ),
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        Text(
-                          gameMessage,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            height: 1.4,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 28),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 56,
-                    child: ElevatedButton.icon(
-                      onPressed: overCompleted ? restartOver : playBall,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: overCompleted
-                            ? const Color(0xFFD97706)
-                            : const Color(0xFF4F46E5),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
+                  const SizedBox(height: 48),
+                  ElevatedButton(
+                    onPressed: playShot,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: gameFinished
+                          ? const Color(0xFFD97706)
+                          : const Color(0xFF064E3B),
+                      foregroundColor: Colors.white,
+                      elevation: 5,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 25,
+                        vertical: 13,
                       ),
-                      icon: Icon(
-                        overCompleted ? Icons.refresh : Icons.sports_cricket,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      label: Text(
-                        overCompleted ? 'RESTART OVER' : 'PLAY BALL',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    ),
+                    child: Text(
+                      gameFinished ? 'Restart' : 'Bat',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 18),
-
-                  Text(
-                    overCompleted
-                        ? 'The over is complete'
-                        : '${maximumBalls - ballsPlayed} ball${maximumBalls - ballsPlayed == 1 ? '' : 's'} remaining',
-                    style: const TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 100),
                 ],
               ),
             ),
@@ -297,47 +148,58 @@ class _CricketOverScreenState extends State<CricketOverScreen> {
     );
   }
 
-  Widget informationCard({
-    required String label,
+  Widget cricketDisplay({
+    required String imagePath,
+    required String title,
     required String value,
-    required IconData icon,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 27, color: const Color(0xFF4F46E5)),
-
-          const SizedBox(height: 10),
-
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.bold,
-              color: Colors.black45,
-            ),
+    return Column(
+      children: [
+        Container(
+          width: 110,
+          height: 110,
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
           ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1E1B4B),
-            ),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.contain,
+            errorBuilder: (
+              BuildContext context,
+              Object error,
+              StackTrace? stackTrace,
+            ) {
+              return const Center(
+                child: Icon(
+                  Icons.image_not_supported_outlined,
+                  size: 42,
+                  color: Colors.grey,
+                ),
+              );
+            },
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 29,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }
